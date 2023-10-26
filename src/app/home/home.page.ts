@@ -3,9 +3,11 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, I
 import { addIcons } from 'ionicons';
 import { add, trash } from 'ionicons/icons';
 import { SQLiteCommunityService } from '../services/sqlite-community.service';
-import { User, UserDatabaseService } from '../services/user-database.service';
+import { UserDatabaseService } from '../services/user-database.service';
 import { FormsModule } from '@angular/forms';
 import { NgFor } from '@angular/common';
+import { Preference, User } from '../models/models';
+import { PreferencesService } from '../services/preferences.service';
 
 const createSchemaTest: string = `
   CREATE TABLE IF NOT EXISTS test (
@@ -42,24 +44,34 @@ export class HomePage implements OnInit, OnDestroy {
 
   users!: WritableSignal<User[]>;
   newUserName: string = '';
+  checked: boolean = false;
+  prefs!: Preference;
 
   @ViewChild(IonInput) input!: IonInput;
 
   constructor(
     private sqliteService: SQLiteCommunityService,
-    private userdb: UserDatabaseService
+    private userdb: UserDatabaseService,
+    private preferences: PreferencesService
   ) {
     addIcons({ add, trash });
     console.log('va a iniciar la db');
     this.userdb.initUserDataBase();
     this.users = this.userdb.getUsers();
   }
-  
+
   async ngOnInit() {
+    this.prefs = await this.preferences.cofigurePreferences();
+    this.checked = this.prefs.checked;
   }
 
   async ngOnDestroy() {
     this.userdb.endUserDataBase();
+  }
+
+  setPreference() {
+    this.checked = !this.checked;
+    this.preferences.setPreferences(this.checked);
   }
 
   setText(ev: Event) {
@@ -113,7 +125,7 @@ export class HomePage implements OnInit, OnDestroy {
     // mode 'one' INSERT
     const resI1 = await db.run("INSERT INTO test (name,email) VALUES ('Jones','jones@example.com') , ('Davison','davison@example.com') RETURNING email;", [], true, 'one');
     console.log(`\t>>> Insersion en modo 'on' (devuelve en valores todas las modificaciones): ${JSON.stringify(resI1)}`);
-    
+
     // mode 'all' INSERT with values
     const resI3 = await db.run("INSERT INTO test (name,email) VALUES (?,?) , (?,?) RETURNING name;", ['Dupond', 'dupond@example.com', 'Toto', 'toto@example.com'], true, 'all');
     console.log(`\t>>> Insersion en modo 'all' con  v a l o r e s:  ${JSON.stringify(resI3)}`);
