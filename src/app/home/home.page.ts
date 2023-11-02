@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, OnDestroy, OnInit, ViewChild, WritableSignal } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonInput, IonAccordionGroup, IonItem, IonButton, IonIcon, IonCheckbox, ModalController } from '@ionic/angular/standalone';
+import { Component, OnDestroy, OnInit, ViewChild, WritableSignal } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonInput, IonItem, IonButton, IonIcon, IonCheckbox, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, trash } from 'ionicons/icons';
 import { SQLiteCommunityService } from '../services/sqlite-community.service';
@@ -8,7 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { NgFor } from '@angular/common';
 import { Preference, User } from '../models/models';
 import { PreferencesService } from '../services/preferences.service';
-import { ModalSwiperComponent } from '../components/modal-swiper/modal-swiper.component';
 
 const createSchemaTest: string = `
   CREATE TABLE IF NOT EXISTS test (
@@ -40,7 +39,6 @@ const createSchemaTest: string = `
     NgFor,
     FormsModule
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class HomePage implements OnInit, OnDestroy {
 
@@ -55,24 +53,15 @@ export class HomePage implements OnInit, OnDestroy {
     private sqliteService: SQLiteCommunityService,
     private userdb: UserDatabaseService,
     private preferences: PreferencesService,
-    private modalCtrl: ModalController
   ) {
     addIcons({ add, trash });
-    console.log('va a iniciar la db');
     this.userdb.initUserDataBase();
     this.users = this.userdb.getUsers();
   }
 
   async ngOnInit() {
-    this.prefs = await this.preferences.cofigurePreferences();
-    this.checked = this.prefs.checked;
-
-    const modal = await this.modalCtrl.create({
-      component: ModalSwiperComponent,
-      id: 'example-modal'
-    });
-
-    await modal.present();
+    const preferences = await this.preferences.cofigurePreferences();
+    this.checked = preferences.checked;
   }
 
   async ngOnDestroy() {

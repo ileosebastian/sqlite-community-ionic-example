@@ -51,4 +51,9 @@ ion-modal#example-modal ion-icon {
 
 ion-modal#example-modal .wrapper {
   margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 }
+

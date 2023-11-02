@@ -1,7 +1,9 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core';
-import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit } from '@angular/core';
+import { IonApp, IonModal, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 import { SQLiteCommunityService } from './services/sqlite-community.service';
 import { register } from 'swiper/element/bundle';
+import { PreferencesService } from './services/preferences.service';
+import { ModalSwiperComponent } from './components/modal-swiper/modal-swiper.component';
 
 register();
 
@@ -9,18 +11,31 @@ register();
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
-  imports: [IonApp, IonRouterOutlet],
+  imports: [
+    IonApp,
+    IonRouterOutlet,
+    IonModal,
+    ModalSwiperComponent
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent {
 
   private initDBPlugin: boolean = false;
+  isFirstBoot: boolean = false;
 
   constructor(
     private _sqlite: SQLiteCommunityService,
-    private platform: Platform
+    private platform: Platform,
+    private preferences: PreferencesService,
   ) {
     this.initializePlugin();
+    this.preferences.isBoottingInsertion()
+      .then(res => this.isFirstBoot = res)
+      .catch(err => {
+        console.error("=>", err);
+        this.isFirstBoot = false;
+      })
   }
 
   initializePlugin() {

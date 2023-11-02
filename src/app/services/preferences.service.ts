@@ -13,7 +13,6 @@ export class PreferencesService {
   async cofigurePreferences() {
     const { value } = await Preferences.get({ key: 'checked' });
     const preferences: Preference = { checked: false };
-    console.log(">>>> >>>> >>>> >>>> >>>> >>>> >>>> >>>> >>>> VALUE:", value);
     if (value) {
       preferences.checked = value === 'true';
     } else {
@@ -25,10 +24,22 @@ export class PreferencesService {
     return preferences;
   }
 
+  async isBoottingInsertion() {
+    const { value } = await Preferences.get({ key: 'isBoot' });
+    return value === null ? true : value === 'true';
+  }
+
   async setPreferences(checked: boolean) {
     await Preferences.set({
       key: 'checked',
       value: String(checked)
+    });
+  }
+
+  async setBootstrapInsertion(isBoot: boolean) {
+    await Preferences.set({
+      key: 'isBoot',
+      value: String(isBoot)
     });
   }
 

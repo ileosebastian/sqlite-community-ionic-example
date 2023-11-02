@@ -1,3 +1,8 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
+  <ion-modal [isOpen]="isFirstBoot" id="example-modal" [backdropDismiss]="false">
+    <ng-template>
+      <app-modal-swiper style="height: 100%;" (emittCloseModa)="isFirstBoot = $event"></app-modal-swiper>
+    </ng-template>
+  </ion-modal>
 </ion-app>
