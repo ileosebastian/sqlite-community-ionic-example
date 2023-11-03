@@ -1,23 +1,67 @@
-<ion-content>
-  <swiper-container [pagination]="true">
+<!-- <ion-content>
   
-    <swiper-slide>
-      <div class="wrapper ion-padding">
-        <h1 class="ion-text-center">Bienvenido a insertar datos!</h1>
-        <ion-button color="tertiary">
-          Insertar datos
-        </ion-button>
-      </div>
-    </swiper-slide>
-  
-    <swiper-slide>
-      <div class="ion-padding wrapper">
-        <h4 class="ion-text-center">Listo! Se ha terminado el proceso de insersion con exito</h4>
-        <ion-button (click)="setEndModal()" expand="block" fill="clear" shape="round">
-          Entendido
-        </ion-button>
-      </div>
-    </swiper-slide>
-  
-  </swiper-container>
-</ion-content>
+</ion-content> -->
+
+<div [ngSwitch]="state" class="center-modal">
+
+  <section *ngSwitchCase="'welcome'" class="center-section scale-in-ver-bottom">
+    <div class="center-content">
+      welcome
+    </div>
+    <div class="center-options">
+      <ion-button color="danger" (click)="exitApp()">
+        <ion-label class="ion-text-uppercase">salir</ion-label>
+      </ion-button>
+
+      <ion-button color="tertiary" (click)="nextState()">
+        <ion-label class="ion-text-uppercase">continuar</ion-label>
+      </ion-button>
+    </div>
+  </section>
+
+  <section *ngSwitchCase="'selection'" class="center-section scale-in-ver-bottom">
+    <div class="center-content">
+      selection
+    </div>
+    <div class="center-options">
+      <ion-button color="secondary" (click)="previousState()">
+        <ion-label class="ion-text-uppercase">volver</ion-label>
+      </ion-button>
+
+      <ion-button color="tertiary" (click)="nextState()">
+        <ion-label class="ion-text-uppercase">continuar</ion-label>
+      </ion-button>
+    </div>
+  </section>
+
+  <section *ngSwitchCase="'installation'" class="center-section scale-in-ver-bottom">
+    <div class="center-content">
+      installation
+    </div>
+    <div class="center-options">
+      <ion-button color="danger" (click)="previousState()">
+        <ion-label class="ion-text-uppercase">Cancelar</ion-label>
+      </ion-button>
+
+      <ion-button color="tertiary" (click)="nextState()" [disabled]="true">
+        <ion-label class="ion-text-uppercase">descargar</ion-label>
+      </ion-button>
+    </div>
+  </section>
+
+  <section *ngSwitchCase="'error'" class="center-section scale-in-ver-bottom">
+    <div class="center-content">
+      Error
+    </div>
+    <div class="center-options">
+      <ion-button color="danger" (click)="exitApp()">
+        <ion-label class="ion-text-uppercase">salir</ion-label>
+      </ion-button>
+
+      <ion-button color="tertiary" (click)="nextState()">
+        <ion-label class="ion-text-uppercase">continuar</ion-label>
+      </ion-button>
+    </div>
+  </section>
+
+</div>

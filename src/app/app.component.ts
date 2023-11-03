@@ -1,9 +1,10 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonApp, IonModal, IonRouterOutlet, Platform } from '@ionic/angular/standalone';
 import { SQLiteCommunityService } from './services/sqlite-community.service';
-import { register } from 'swiper/element/bundle';
 import { PreferencesService } from './services/preferences.service';
 import { ModalSwiperComponent } from './components/modal-swiper/modal-swiper.component';
+
+import { register } from 'swiper/element/bundle';
 
 register();
 
@@ -17,7 +18,6 @@ register();
     IonModal,
     ModalSwiperComponent
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent {
 
