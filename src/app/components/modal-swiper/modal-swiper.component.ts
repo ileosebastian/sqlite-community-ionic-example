@@ -6,8 +6,9 @@ import { personCircle } from 'ionicons/icons';
 import { PreferencesService } from 'src/app/services/preferences.service';
 
 import { App } from '@capacitor/app';
+import { states } from 'src/app/models/types';
+import { OptionModalComponent } from '../option-modal/option-modal.component';
 
-type states = 'welcome' | 'selection' | 'installation' | 'error';
 
 @Component({
   selector: 'app-modal-swiper',
@@ -22,7 +23,8 @@ type states = 'welcome' | 'selection' | 'installation' | 'error';
 
     IonButtons,
     IonButton,
-    IonLabel
+    IonLabel,
+    OptionModalComponent
   ],
 })
 export class ModalSwiperComponent implements OnInit {
@@ -39,35 +41,20 @@ export class ModalSwiperComponent implements OnInit {
   ) {
     addIcons({ personCircle });
     this.pointer = 0;
-    this.state = this.normalStatus[this.pointer];
+    this.state = this.normalStatus[0];
   }
 
   ngOnInit() { }
 
-  nextState() {
-    if (this.pointer >= (this.normalStatus.length - 1)) {
-      this.pointer = 0;
-    } else {
-      this.pointer++;
-    }
-    console.log('pointer', this.pointer, (this.normalStatus.length - 1));
-
-    this.state = this.normalStatus[this.pointer];
+  listenState(data: { state: states, pointer: number }) {
+    console.log("cambia estado a ", data.state);
+    this.state = data.state;
+    this.pointer = data.pointer;
   }
 
-  previousState() {
-    if (this.pointer <= 0) {
-      this.pointer = this.normalStatus.length - 1;
-    } else {
-      this.pointer--;
-    }
-    console.log('pointer', this.pointer);
-    this.state = this.normalStatus[this.pointer];
-  }
+  nextState() { }
 
-  async exitApp() {
-    await App.exitApp();
-  }
+  previousState() { }
 
   async setEndModal() {
     await this.preferencesSrv.setBootstrapInsertion(false);

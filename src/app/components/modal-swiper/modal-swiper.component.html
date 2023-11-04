@@ -1,7 +1,3 @@
-<!-- <ion-content>
-  
-</ion-content> -->
-
 <div [ngSwitch]="state" class="center-modal">
 
   <section *ngSwitchCase="'welcome'" class="center-section scale-in-ver-bottom">
@@ -9,13 +5,14 @@
       welcome
     </div>
     <div class="center-options">
-      <ion-button color="danger" (click)="exitApp()">
-        <ion-label class="ion-text-uppercase">salir</ion-label>
-      </ion-button>
-
-      <ion-button color="tertiary" (click)="nextState()">
-        <ion-label class="ion-text-uppercase">continuar</ion-label>
-      </ion-button>
+      <app-option-modal
+        style="width: 100%; padding-bottom: 10px;"
+        (emittState)="listenState($event)"
+        firstButtonRole="exit"
+        secondButtonRole="next"
+        [pointer]="pointer"
+        [normalStatus]="normalStatus">
+      </app-option-modal>
     </div>
   </section>
 
@@ -24,13 +21,14 @@
       selection
     </div>
     <div class="center-options">
-      <ion-button color="secondary" (click)="previousState()">
-        <ion-label class="ion-text-uppercase">volver</ion-label>
-      </ion-button>
-
-      <ion-button color="tertiary" (click)="nextState()">
-        <ion-label class="ion-text-uppercase">continuar</ion-label>
-      </ion-button>
+      <app-option-modal
+        style="width: 100%; padding-bottom: 10px;"
+        (emittState)="listenState($event)"
+        firstButtonRole="previous"
+        secondButtonRole="next"
+        [pointer]="pointer"
+        [normalStatus]="normalStatus">
+      </app-option-modal>
     </div>
   </section>
 
@@ -39,13 +37,14 @@
       installation
     </div>
     <div class="center-options">
-      <ion-button color="danger" (click)="previousState()">
-        <ion-label class="ion-text-uppercase">Cancelar</ion-label>
-      </ion-button>
-
-      <ion-button color="tertiary" (click)="nextState()" [disabled]="true">
-        <ion-label class="ion-text-uppercase">descargar</ion-label>
-      </ion-button>
+      <app-option-modal
+        style="width: 100%; padding-bottom: 10px;"
+        (emittState)="listenState($event)"
+        firstButtonRole="cancel"
+        secondButtonRole="done"
+        [pointer]="pointer"
+        [normalStatus]="normalStatus">
+      </app-option-modal>
     </div>
   </section>
 
@@ -54,7 +53,7 @@
       Error
     </div>
     <div class="center-options">
-      <ion-button color="danger" (click)="exitApp()">
+      <ion-button color="danger" (click)="previousState()">
         <ion-label class="ion-text-uppercase">salir</ion-label>
       </ion-button>
 
