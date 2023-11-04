@@ -4,9 +4,6 @@ import { SQLiteCommunityService } from './services/sqlite-community.service';
 import { PreferencesService } from './services/preferences.service';
 import { ModalSwiperComponent } from './components/modal-swiper/modal-swiper.component';
 
-import { register } from 'swiper/element/bundle';
-
-register();
 
 @Component({
   selector: 'app-root',
