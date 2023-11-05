@@ -1,11 +1,10 @@
 import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonButton, IonButtons, IonContent, IonLabel } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonContent, IonItem, IonLabel, IonProgressBar, IonRadio, IonRadioGroup, IonTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personCircle } from 'ionicons/icons';
 import { PreferencesService } from 'src/app/services/preferences.service';
 
-import { App } from '@capacitor/app';
 import { states } from 'src/app/models/types';
 import { OptionModalComponent } from '../option-modal/option-modal.component';
 
@@ -16,14 +15,18 @@ import { OptionModalComponent } from '../option-modal/option-modal.component';
   styleUrls: ['./modal-swiper.component.scss'],
   standalone: true,
   imports: [
-    IonContent,
     NgSwitch,
     NgSwitchCase,
     NgSwitchDefault,
 
-    IonButtons,
-    IonButton,
+    IonContent,
+    IonTitle,
+    IonRadioGroup,
+    IonRadio,
+    IonItem,
     IonLabel,
+    IonProgressBar,
+
     OptionModalComponent
   ],
 })
@@ -36,6 +39,9 @@ export class ModalSwiperComponent implements OnInit {
   pointer!: number;
   normalStatus: states[] = ['welcome', 'selection', 'installation'];
 
+  public progress = 0;
+  private intervalHandler!: any;
+
   constructor(
     private preferencesSrv: PreferencesService
   ) {
@@ -47,14 +53,26 @@ export class ModalSwiperComponent implements OnInit {
   ngOnInit() { }
 
   listenState(data: { state: states, pointer: number }) {
-    console.log("cambia estado a ", data.state);
     this.state = data.state;
     this.pointer = data.pointer;
+
+    if (data.state === 'installation') {
+      this.intervalHandler = setInterval(() => {
+        this.progress += 0.01;
+
+        // Reset the progress bar when it reaches 100%
+        // to continuously show the demo
+        if (this.progress > 1) {
+          setTimeout(() => {
+            this.progress = 0;
+          }, 1000);
+        }
+      }, 50);
+    } else {
+      clearInterval(this.intervalHandler);
+      this.progress = 0;
+    }
   }
-
-  nextState() { }
-
-  previousState() { }
 
   async setEndModal() {
     await this.preferencesSrv.setBootstrapInsertion(false);

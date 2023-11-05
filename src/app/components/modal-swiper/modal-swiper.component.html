@@ -2,48 +2,52 @@
 
   <section *ngSwitchCase="'welcome'" class="center-section scale-in-ver-bottom">
     <div class="center-content">
-      welcome
+      <h3 class="ion-text-center ion-text-wrap">Bienvenido al menu de instalacion!</h3>
     </div>
     <div class="center-options">
-      <app-option-modal
-        style="width: 100%; padding-bottom: 10px;"
-        (emittState)="listenState($event)"
-        firstButtonRole="exit"
-        secondButtonRole="next"
-        [pointer]="pointer"
-        [normalStatus]="normalStatus">
+      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)"
+        firstButtonRole="exit" secondButtonRole="next" [pointer]="pointer" [normalStatus]="normalStatus">
       </app-option-modal>
     </div>
   </section>
 
   <section *ngSwitchCase="'selection'" class="center-section scale-in-ver-bottom">
-    <div class="center-content">
-      selection
+    <div class="center-content" style="gap: 10px;">
+      <h6 class="ion-text-center ion-text-wrap">Debe instalar cosas, y aqui le pongo nombres a
+        escoger</h6>
+      <ion-radio-group value="corazon" style="width: inherit;">
+        <ion-item>
+          <ion-radio value="corazon" justify="space-between">
+            <ion-label class="ion-text-wrap">Corazon</ion-label>
+          </ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-radio value="akira" justify="space-between">
+            <ion-label class="ion-text-wrap">Akira</ion-label>
+          </ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-radio value="leo" justify="space-between">
+            <ion-label class="ion-text-wrap">Leo</ion-label>
+          </ion-radio>
+        </ion-item>
+      </ion-radio-group>
     </div>
     <div class="center-options">
-      <app-option-modal
-        style="width: 100%; padding-bottom: 10px;"
-        (emittState)="listenState($event)"
-        firstButtonRole="previous"
-        secondButtonRole="next"
-        [pointer]="pointer"
-        [normalStatus]="normalStatus">
+      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)"
+        firstButtonRole="previous" secondButtonRole="next" [pointer]="pointer" [normalStatus]="normalStatus">
       </app-option-modal>
     </div>
   </section>
 
   <section *ngSwitchCase="'installation'" class="center-section scale-in-ver-bottom">
     <div class="center-content">
-      installation
+      <h6 class="ion-text-center ion-text-wrap">Instalando paquetes...</h6>
+      <ion-progress-bar [value]="progress"></ion-progress-bar>
     </div>
     <div class="center-options">
-      <app-option-modal
-        style="width: 100%; padding-bottom: 10px;"
-        (emittState)="listenState($event)"
-        firstButtonRole="cancel"
-        secondButtonRole="done"
-        [pointer]="pointer"
-        [normalStatus]="normalStatus">
+      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)" (emmittCloseModal)="setEndModal()"
+        firstButtonRole="cancel" secondButtonRole="done" [pointer]="pointer" [normalStatus]="normalStatus">
       </app-option-modal>
     </div>
   </section>
@@ -53,13 +57,7 @@
       Error
     </div>
     <div class="center-options">
-      <ion-button color="danger" (click)="previousState()">
-        <ion-label class="ion-text-uppercase">salir</ion-label>
-      </ion-button>
 
-      <ion-button color="tertiary" (click)="nextState()">
-        <ion-label class="ion-text-uppercase">continuar</ion-label>
-      </ion-button>
     </div>
   </section>
 

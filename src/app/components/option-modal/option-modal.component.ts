@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { App } from '@capacitor/app';
 import { IonButton, IonLabel } from '@ionic/angular/standalone';
-import { concatMapTo } from 'rxjs';
 import { states } from 'src/app/models/types';
 
 
@@ -18,6 +17,8 @@ type buttonRole = 'exit' | 'previous' | 'next' | 'cancel' | 'installation' | 'do
   ]
 })
 export class OptionModalComponent implements OnInit {
+
+  @Output() emmittCloseModal = new EventEmitter();
 
   buttonTextByRole: { [key in buttonRole]: string } = {
     'exit': 'salir',
@@ -46,7 +47,10 @@ export class OptionModalComponent implements OnInit {
   }
 
   secondButtonController() {
-    if (['next', 'installation', 'done'].includes(this.secondButtonRole)) this.nextState();
+    if (['next', 'installation'].includes(this.secondButtonRole)) this.nextState();
+    if (this.secondButtonRole === 'done') {
+      this.emmittCloseModal.emit();
+    }
   }
 
   nextState() {
