@@ -15,7 +15,7 @@
     <div class="center-content" style="gap: 10px;">
       <h6 class="ion-text-center ion-text-wrap">Debe instalar cosas, y aqui le pongo nombres a
         escoger</h6>
-      <ion-radio-group value="corazon" style="width: inherit;">
+      <ion-radio-group #optionName value="corazon" (ionChange)="selectName($event)" style="width: inherit;">
         <ion-item>
           <ion-radio value="corazon" justify="space-between">
             <ion-label class="ion-text-wrap">Corazon</ion-label>
@@ -34,7 +34,7 @@
       </ion-radio-group>
     </div>
     <div class="center-options">
-      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)"
+      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)" [isSecondButtonDisabled]="disableBtn"
         firstButtonRole="previous" secondButtonRole="next" [pointer]="pointer" [normalStatus]="normalStatus">
       </app-option-modal>
     </div>
@@ -42,11 +42,11 @@
 
   <section *ngSwitchCase="'installation'" class="center-section scale-in-ver-bottom">
     <div class="center-content">
-      <h6 class="ion-text-center ion-text-wrap">Instalando paquetes...</h6>
+      <h6 class="ion-text-center ion-text-wrap">Instalando paquetes para {{ name | titlecase }}...</h6>
       <ion-progress-bar [value]="progress"></ion-progress-bar>
     </div>
     <div class="center-options">
-      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)" (emmittCloseModal)="setEndModal()"
+      <app-option-modal style="width: 100%; padding-bottom: 10px;" (emittState)="listenState($event)" (emmittCloseModal)="setEndModal()" [isSecondButtonDisabled]="disableBtn"
         firstButtonRole="cancel" secondButtonRole="done" [pointer]="pointer" [normalStatus]="normalStatus">
       </app-option-modal>
     </div>

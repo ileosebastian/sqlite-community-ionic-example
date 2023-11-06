@@ -1,8 +1,9 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { SQLiteCommunityService } from './sqlite-community.service';
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { User } from '../models/models';
+import { USERS } from '../mock/data';
 
 const DB_USERS = 'userdb';
 
@@ -58,6 +59,9 @@ export class UserDatabaseService {
     await this.db.close();
 
     this.users.set(users.values || []);
+  }
+
+  async insertMassiveData() {
   }
 
   async addUser(name: string) {

@@ -32,6 +32,7 @@ export class OptionModalComponent implements OnInit {
   @Input() normalStatus: states[] = [];
   @Input() firstButtonRole!: buttonRole;
   @Input() secondButtonRole!: buttonRole;
+  @Input() isSecondButtonDisabled: boolean = false;
   @Output() emittState = new EventEmitter<{ state: states, pointer: number }>();
   @Input() pointer!: number;
 

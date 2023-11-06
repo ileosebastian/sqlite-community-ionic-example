@@ -3,7 +3,7 @@
     <ion-label class="ion-text-uppercase">{{ buttonTextByRole[firstButtonRole] }}</ion-label>
   </ion-button>
   
-  <ion-button [color]="secondButtonRole === 'done' ? 'primary' : 'tertiary'" (click)="secondButtonController()">
+  <ion-button [color]="secondButtonRole === 'done' ? 'primary' : 'tertiary'" (click)="secondButtonController()" [disabled]="isSecondButtonDisabled">
     <ion-label class="ion-text-uppercase">{{ buttonTextByRole[secondButtonRole] }}</ion-label>
   </ion-button>
 </div>
