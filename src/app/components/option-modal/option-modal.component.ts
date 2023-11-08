@@ -71,7 +71,7 @@ export class OptionModalComponent implements OnInit {
       this.pointer--;
     }
 
-    this.emittState.emit({ state: this.normalStatus[this.pointer], pointer: this.pointer });
+    this.emittState.emit({ state: this.firstButtonRole === 'cancel' ? 'cancel' : this.normalStatus[this.pointer], pointer: this.pointer });
   }
 
   async exitApp() {

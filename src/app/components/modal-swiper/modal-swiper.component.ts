@@ -1,8 +1,8 @@
 import { NgSwitch, NgSwitchCase, NgSwitchDefault, TitleCasePipe } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { IonContent, IonItem, IonLabel, IonProgressBar, IonRadio, IonRadioGroup, IonTitle, RadioGroupChangeEventDetail, RadioGroupCustomEvent } from '@ionic/angular/standalone';
+import { Component, EventEmitter, OnInit, Output, ViewChild, WritableSignal, signal } from '@angular/core';
+import { IonButton, IonContent, IonItem, IonLabel, IonProgressBar, IonRadio, IonRadioGroup, IonTitle, RadioGroupChangeEventDetail, RadioGroupCustomEvent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { codeSlashOutline, personCircle } from 'ionicons/icons';
+import { personCircle } from 'ionicons/icons';
 import { PreferencesService } from 'src/app/services/preferences.service';
 
 import { states } from 'src/app/models/types';
@@ -29,6 +29,7 @@ import { USERS } from 'src/app/mock/data';
     IonItem,
     IonLabel,
     IonProgressBar,
+    IonButton,
 
     OptionModalComponent
   ],
@@ -47,7 +48,7 @@ export class ModalSwiperComponent implements OnInit {
   name!: string;
   disableBtn: boolean = false;
 
-  public progress = 0;
+  progress: WritableSignal<number> = signal(0);
   private intervalHandler!: any;
 
   constructor(
@@ -57,6 +58,7 @@ export class ModalSwiperComponent implements OnInit {
     addIcons({ personCircle });
     this.pointer = 0;
     this.state = this.normalStatus[0];
+    this.progress = this.userDatabaseSrv.getProgress();
   }
 
   async ngOnInit() { }
@@ -72,7 +74,6 @@ export class ModalSwiperComponent implements OnInit {
   private endTimeoutHandler: any;
 
   async listenState(data: { state: states, pointer: number }) {
-    console.log("LLEGA COMO:", data.state);
     this.state = data.state;
     this.pointer = data.pointer;
 
@@ -91,56 +92,33 @@ export class ModalSwiperComponent implements OnInit {
       return;
     }
 
+    if (data.state === 'cancel') {
+      this.userDatabaseSrv.stopProgress = true;
+      this.userDatabaseSrv.cancelMassiveInsertionDataUsers()
+        .then(() => {
+          this.state = 'selection';
+          this.userDatabaseSrv.stopProgress = false;
+        });
+    }
+
     if (data.state === 'installation') {
       this.disableBtn = true;
-      this.progress = 0;
 
       const users = USERS.slice(0, 100);
 
-      const firstQuartile = Math.floor((users.length - 1) / 4);
-      const secondQuartile = Math.floor((users.length - 1) / 2);
-      const thirdQuartile = firstQuartile + secondQuartile;
-      const endQuartile = users.length - 1;
-
-      console.log(users);
-      console.log(`first: ${firstQuartile}, second: ${secondQuartile}, third: ${thirdQuartile}, end: ${endQuartile}.`)
-
-      console.log("-------------------- 25% --------------------");
-      this.userDatabaseSrv.insertMassiveDataUsers(users.slice(0, firstQuartile))
-        .then(() => {
-          this.progress = 0.25;
-
-          console.log("-------------------- 50% --------------------");
-          this.userDatabaseSrv.insertMassiveDataUsers(users.slice(firstQuartile, secondQuartile))
-            .then(() => {
-              this.progress = 0.50;
-              console.log("--------------------  75% --------------------");
-
-              this.userDatabaseSrv.insertMassiveDataUsers(users.slice(secondQuartile, thirdQuartile))
-                .then(() => {
-                  this.progress = 0.75;
-
-                  console.log("-------------------- 100% --------------------");
-                  this.userDatabaseSrv.insertMassiveDataUsers(users.splice(thirdQuartile, endQuartile))
-                    .then(() => {
-                      this.progress = 1;
-                      this.userDatabaseSrv.loadUsers();
-                      this.disableBtn = false;
-                    })
-                })
-            })
-        });
+      await this.userDatabaseSrv.insertMassiveDataUsers(users);
+      this.disableBtn = false;
+      this.userDatabaseSrv.loadUsers();
 
       return;
     }
   }
 
   async setEndModal() {
-    await this.preferencesSrv.setBootstrapInsertion(false);
+    if (this.state === 'installation') {
+      await this.preferencesSrv.setBootstrapInsertion(false);
+    }
     this.emittCloseModa.emit(false);
-  }
-
-  async insertAllData() {
   }
 
 }

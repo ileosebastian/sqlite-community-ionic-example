@@ -1,2 +1,2 @@
 
-export type states = 'welcome' | 'selection' | 'installation' | 'error';
+export type states = 'welcome' | 'selection' | 'installation' | 'cancel' | 'error';
