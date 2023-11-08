@@ -35,13 +35,17 @@
 
     <ion-row>
       <ion-col size="12">
-        <ion-item *ngFor="let user of users()">
+        <ion-item *ngIf="users().length <= 0">
+          <ion-label>Cargando...</ion-label>
+        </ion-item>
+        <ion-item *ngFor="let user of users(); let i = index;">
           <ion-checkbox slot="start" [(ngModel)]="user.active" (ionChange)="updateUser(user)" labelPlacement="end">
             {{ user.name }}
           </ion-checkbox>
 
           <ion-button slot="end" (click)="deleteUser(user)" fill="clear" color="danger">
-            <ion-icon slot="icon-only" name="trash"></ion-icon>
+            <ion-label slot="start">{{ i }}</ion-label>
+            <ion-icon slot="end" name="trash"></ion-icon>
           </ion-button>
         </ion-item>
       </ion-col>

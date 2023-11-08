@@ -4,6 +4,7 @@ import { SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../models/models';
 import { USERS } from '../mock/data';
+import { states } from '../models/types';
 
 const DB_USERS = 'userdb';
 
@@ -30,6 +31,7 @@ export class UserDatabaseService {
     }
     this.db = db;
 
+    // DROP TABLE IF EXISTS users;
     await this.db.open();
     const schema = `
           CREATE TABLE IF NOT EXISTS users (
@@ -61,7 +63,36 @@ export class UserDatabaseService {
     this.users.set(users.values || []);
   }
 
-  async insertMassiveData() {
+  async insertMassiveDataUsers(users: User[]) {
+    try {
+      if (this.db) {
+        await this.db.open();
+    
+        const isAnActiveTrans = await this.db.isTransactionActive();
+
+        if (!isAnActiveTrans.result) {
+          try {
+            await this.db.beginTransaction();
+        
+            for (const user of USERS.slice(0, 1000)) {
+              // const query = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
+              // await this.db.query(query);
+              console.log(user);
+            }
+        
+            await this.db.commitTransaction();
+          } catch(err) {
+            console.error("====> ", err);
+            this.db.rollbackTransaction();
+          }
+        }
+        
+        await this.db.close();
+        return;
+      } 
+    } catch (error) {
+      console.error("==>", error);
+    }
   }
 
   async addUser(name: string) {

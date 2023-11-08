@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild, WritableSignal } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonInput, IonItem, IonButton, IonIcon, IonCheckbox, ModalController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonInput, IonItem, IonButton, IonIcon, IonCheckbox, ModalController, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, trash } from 'ionicons/icons';
 import { SQLiteCommunityService } from '../services/sqlite-community.service';
 import { UserDatabaseService } from '../services/user-database.service';
 import { FormsModule } from '@angular/forms';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 import { Preference, User } from '../models/models';
 import { PreferencesService } from '../services/preferences.service';
 
@@ -37,7 +37,9 @@ const createSchemaTest: string = `
     IonIcon,
     IonCheckbox,
     NgFor,
-    FormsModule
+    FormsModule,
+    IonLabel,
+    NgIf,
   ],
 })
 export class HomePage implements OnInit, OnDestroy {
@@ -56,7 +58,9 @@ export class HomePage implements OnInit, OnDestroy {
   ) {
     addIcons({ add, trash });
     this.userdb.initUserDataBase();
+      
     this.users = this.userdb.getUsers();
+    console.log("se ha iniciado en el constructor");
   }
 
   async ngOnInit() {

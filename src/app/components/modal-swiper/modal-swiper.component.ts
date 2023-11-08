@@ -59,9 +59,7 @@ export class ModalSwiperComponent implements OnInit {
     this.state = this.normalStatus[0];
   }
 
-  async ngOnInit() {
-    await this.userDatabaseSrv.insertMassiveData();
-  }
+  async ngOnInit() { }
 
   selectName(ev: Event) {
     const event = ev as RadioGroupCustomEvent;
@@ -96,43 +94,42 @@ export class ModalSwiperComponent implements OnInit {
     if (data.state === 'installation') {
       this.disableBtn = true;
       this.progress = 0;
-      const firstQuartile = Math.floor((USERS.length - 1) / 4);
-      const secondQuartile = Math.floor((USERS.length - 1) / 2);
+
+      const users = USERS.slice(0, 100);
+
+      const firstQuartile = Math.floor((users.length - 1) / 4);
+      const secondQuartile = Math.floor((users.length - 1) / 2);
       const thirdQuartile = firstQuartile + secondQuartile;
-      const endQuartile = USERS.length - 1;
+      const endQuartile = users.length - 1;
 
-      this.firstTimeoutHandler = setTimeout(() => {
-        console.log("-------------------- 25% --------------------");
-        for (let i = 0; i < firstQuartile; i++) {
-          // console.log("USER 1th:", USERS[i]);
-        }
-        this.progress = 0.25;
-      }, 500);
+      console.log(users);
+      console.log(`first: ${firstQuartile}, second: ${secondQuartile}, third: ${thirdQuartile}, end: ${endQuartile}.`)
 
-      this.secondTimeoutHandler = setTimeout(() => {
-        console.log("-------------------- 50% --------------------");
-        for (let i = firstQuartile; i < secondQuartile; i++) {
-          // console.log("USER 2th:", USERS[i]);
-        }
-        this.progress = 0.50;
-      }, 1000);
+      console.log("-------------------- 25% --------------------");
+      this.userDatabaseSrv.insertMassiveDataUsers(users.slice(0, firstQuartile))
+        .then(() => {
+          this.progress = 0.25;
 
-      this.thirdTimeoutHandler = setTimeout(() => {
-        console.log("--------------------  75% --------------------");
-        for (let i = secondQuartile; i < thirdQuartile; i++) {
-          // console.log("USER 3th:", USERS[i]);
-        }
-        this.progress = 0.75;
-      }, 1500);
+          console.log("-------------------- 50% --------------------");
+          this.userDatabaseSrv.insertMassiveDataUsers(users.slice(firstQuartile, secondQuartile))
+            .then(() => {
+              this.progress = 0.50;
+              console.log("--------------------  75% --------------------");
 
-      this.endTimeoutHandler = setTimeout(() => {
-        console.log("-------------------- 100% --------------------");
-        for (let i = thirdQuartile; i < endQuartile; i++) {
-          // console.log("USER 4th:", USERS[i]);
-        }
-        this.progress = 1;
-        this.disableBtn = false;
-      }, 2000);
+              this.userDatabaseSrv.insertMassiveDataUsers(users.slice(secondQuartile, thirdQuartile))
+                .then(() => {
+                  this.progress = 0.75;
+
+                  console.log("-------------------- 100% --------------------");
+                  this.userDatabaseSrv.insertMassiveDataUsers(users.splice(thirdQuartile, endQuartile))
+                    .then(() => {
+                      this.progress = 1;
+                      this.userDatabaseSrv.loadUsers();
+                      this.disableBtn = false;
+                    })
+                })
+            })
+        });
 
       return;
     }
