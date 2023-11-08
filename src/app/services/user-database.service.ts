@@ -13,7 +13,6 @@ export class UserDatabaseService {
 
   private users: WritableSignal<User[]> = signal<User[]>([]);
   private progress: WritableSignal<number> = signal<number>(0);
-  public stopProgress: boolean = false;
 
   private _sqlite = inject(SQLiteCommunityService);
   private db!: SQLiteDBConnection;
@@ -75,28 +74,18 @@ export class UserDatabaseService {
         const thirdQuartile = firstQuartile + secondQuartile;
         const endQuartile = users.length - 1;
 
-        console.log(users);
-        console.log(`first: ${firstQuartile}, second: ${secondQuartile}, third: ${thirdQuartile}, end: ${endQuartile}.`);
-
         await this.db.open();
 
         const isAnActiveTrans = await this.db.isTransactionActive();
 
         if (!isAnActiveTrans.result) {
           try {
-            // await this.db.beginTransaction();
+            this.progress.set(0);
             await this.db.execute("BEGIN TRANSACTION;", false);
 
-            // for (const user of USERS.slice(0, 1000)) {
-            // console.log(user);
             for (const user of users.slice(0, firstQuartile)) {
-              // const query = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
               const statement = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
-              // await this.db.query(query);
-              // const statement = "INSERT INTO users (id, name) VALUES ('?', '?');";
-              const values = [user.id, user.name];
               const res = await this.db.run(statement, [], false, 'no');
-              console.log("OUTPUT: ", res);
 
               if (res.changes?.changes && res.changes?.changes < 0) {
                 throw new Error('error trans');
@@ -104,14 +93,7 @@ export class UserDatabaseService {
             }
             this.progress.set(0.25);
 
-            // console.log(this.stopProgress);
-            // if (this.stopProgress) {
-            //   throw new Error('Transaction not commited');
-            // }
-
             for (const user of users.slice(firstQuartile, secondQuartile)) {
-              // const query = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
-              // await this.db.query(query);
               const statement = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
               const res = await this.db.run(statement, [], false, 'no');
 
@@ -120,10 +102,6 @@ export class UserDatabaseService {
               }
             }
             this.progress.set(0.50);
-            // console.log(this.stopProgress);
-            // if (this.stopProgress) {
-            //   throw new Error('Transaction not commited');
-            // }
 
             for (const user of users.slice(secondQuartile, thirdQuartile)) {
               // const query = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
@@ -136,14 +114,8 @@ export class UserDatabaseService {
               }
             }
             this.progress.set(0.75);
-            // console.log(this.stopProgress);
-            // if (this.stopProgress) {
-            //   throw new Error('Transaction not commited');
-            // }
 
             for (const user of users.splice(thirdQuartile, endQuartile)) {
-              // const query = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
-              // await this.db.query(query);
               const statement = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
               const res = await this.db.run(statement, [], false, 'no');
 
@@ -153,19 +125,12 @@ export class UserDatabaseService {
             }
             this.progress.set(1);
 
-            // console.log(this.stopProgress);
-            // if (this.stopProgress) {
-            //   throw new Error('Transaction not commited');
-            // }
-
             console.log("va a terminar...")
-            // await this.db.commitTransaction();
             await this.db.execute("COMMIT TRANSACTION;", false);
           } catch (err) {
             console.error("Dentro de la transaccion insertion;", err);
-            // this.db.rollbackTransaction();
-            const isOpen = await this.db.isDBOpen();
-            if (!isOpen.result)
+
+            if (!(await this.isOpenConnection()))
               await this.db.open();
 
             await this.db.execute("ROLLBACK TRANSACTION;", false);
@@ -181,28 +146,22 @@ export class UserDatabaseService {
   }
 
   async cancelMassiveInsertionDataUsers() {
-    this.stopProgress = true;
     try {
       if (this.db) {
-        // if (!isOpen.result)
-        //   await this.db.open();
-
-        // const isAnActiveTrans = await this.db.isTransactionActive();
-
-        // console.log("ESTA ACTIVA EL ROLLBACK EN CANCEL METHOD:", isAnActiveTrans);
-        // if (isAnActiveTrans.result) {
-        console.log("va a hacer rollback trans");
-        // await this.db.rollbackTransaction();
-        // await this.db.execute("ROLLBACK TRANSACTION;", false);
-        // }
-
-        // if (isOpen.result)
-        await this.db.close();
+        if ((await this.isOpenConnection()))
+          await this.db.close();
+        else
+          throw new Error("No open data when call cancel process.");
         return;
       }
     } catch (error) {
       console.error("Error en cancel massive insetion:", error);
     }
+  }
+
+  private async isOpenConnection() {
+    const isOpen = await this.db.isDBOpen();
+    return isOpen.result;
   }
 
   async addUser(name: string) {

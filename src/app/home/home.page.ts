@@ -91,12 +91,10 @@ export class HomePage implements OnInit, OnDestroy {
 
   async updateUser(user: User) {
     const active = user.active ? 1 : 0;
-    console.log('id del user:', user.id);
     this.userdb.updateUserById(user.id, active);
   }
 
   async deleteUser(user: User) {
-    console.log('id del user:', user.id);
     this.userdb.deleteUserById(user.id);
   }
 

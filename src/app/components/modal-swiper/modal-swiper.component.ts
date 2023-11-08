@@ -1,6 +1,6 @@
 import { NgSwitch, NgSwitchCase, NgSwitchDefault, TitleCasePipe } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output, ViewChild, WritableSignal, signal } from '@angular/core';
-import { IonButton, IonContent, IonItem, IonLabel, IonProgressBar, IonRadio, IonRadioGroup, IonTitle, RadioGroupChangeEventDetail, RadioGroupCustomEvent } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonItem, IonLabel, IonProgressBar, IonRadio, IonRadioGroup, IonTitle, RadioGroupCustomEvent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personCircle } from 'ionicons/icons';
 import { PreferencesService } from 'src/app/services/preferences.service';
@@ -49,7 +49,7 @@ export class ModalSwiperComponent implements OnInit {
   disableBtn: boolean = false;
 
   progress: WritableSignal<number> = signal(0);
-  private intervalHandler!: any;
+  cancelProgress: boolean = true;
 
   constructor(
     private preferencesSrv: PreferencesService,
@@ -68,47 +68,43 @@ export class ModalSwiperComponent implements OnInit {
     this.name = event.detail.value;
   }
 
-  private firstTimeoutHandler: any;
-  private secondTimeoutHandler: any;
-  private thirdTimeoutHandler: any;
-  private endTimeoutHandler: any;
-
   async listenState(data: { state: states, pointer: number }) {
     this.state = data.state;
     this.pointer = data.pointer;
 
-    clearTimeout(this.firstTimeoutHandler);
-    clearTimeout(this.secondTimeoutHandler);
-    clearTimeout(this.thirdTimeoutHandler);
-    clearTimeout(this.endTimeoutHandler);
-
     if (data.state === 'selection') {
       this.disableBtn = true;
+
       setTimeout(() => {
         this.name = this.nameOptions.value;
         this.disableBtn = false;
         return;
       }, 0);
+
       return;
     }
 
     if (data.state === 'cancel') {
-      this.userDatabaseSrv.stopProgress = true;
       this.userDatabaseSrv.cancelMassiveInsertionDataUsers()
         .then(() => {
           this.state = 'selection';
-          this.userDatabaseSrv.stopProgress = false;
+          this.cancelProgress = true;
         });
+
+      return;
     }
 
     if (data.state === 'installation') {
       this.disableBtn = true;
+      this.cancelProgress = true;
 
       const users = USERS.slice(0, 100);
 
       await this.userDatabaseSrv.insertMassiveDataUsers(users);
+
+      await this.userDatabaseSrv.loadUsers();
       this.disableBtn = false;
-      this.userDatabaseSrv.loadUsers();
+      this.cancelProgress = false;
 
       return;
     }

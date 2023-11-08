@@ -1,3 +1,4 @@
+import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { App } from '@capacitor/app';
 import { IonButton, IonLabel } from '@ionic/angular/standalone';
@@ -13,7 +14,8 @@ type buttonRole = 'exit' | 'previous' | 'next' | 'cancel' | 'installation' | 'do
   standalone: true,
   imports: [
     IonButton,
-    IonLabel
+    IonLabel,
+    NgIf
   ]
 })
 export class OptionModalComponent implements OnInit {
@@ -35,6 +37,9 @@ export class OptionModalComponent implements OnInit {
   @Input() isSecondButtonDisabled: boolean = false;
   @Output() emittState = new EventEmitter<{ state: states, pointer: number }>();
   @Input() pointer!: number;
+
+  @Input() isInstallationState: boolean = false;
+  @Input() isCancelableProgress: boolean = true;
 
   constructor() { }
 

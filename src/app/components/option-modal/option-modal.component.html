@@ -1,9 +1,19 @@
-<div style="width: 100%; display: flex; justify-content: space-evenly; align-items: center;">
+<div *ngIf="!isInstallationState" style="width: 100%; display: flex; justify-content: space-evenly; align-items: center;">
   <ion-button [color]="['cancel', 'exit'].includes(firstButtonRole) ? 'danger' : 'secondary'" (click)="firstButtonController()">
     <ion-label class="ion-text-uppercase">{{ buttonTextByRole[firstButtonRole] }}</ion-label>
   </ion-button>
   
   <ion-button [color]="secondButtonRole === 'done' ? 'primary' : 'tertiary'" (click)="secondButtonController()" [disabled]="isSecondButtonDisabled">
+    <ion-label class="ion-text-uppercase">{{ buttonTextByRole[secondButtonRole] }}</ion-label>
+  </ion-button>
+</div>
+
+<div *ngIf="isInstallationState" style="width: 100%; display: flex; justify-content: space-evenly; align-items: center;">
+  <ion-button *ngIf="isCancelableProgress" [color]="['cancel', 'exit'].includes(firstButtonRole) ? 'danger' : 'secondary'" (click)="firstButtonController()">
+    <ion-label class="ion-text-uppercase">{{ buttonTextByRole[firstButtonRole] }}</ion-label>
+  </ion-button>
+  
+  <ion-button *ngIf="!isCancelableProgress" [color]="secondButtonRole === 'done' ? 'primary' : 'tertiary'" (click)="secondButtonController()" [disabled]="isSecondButtonDisabled">
     <ion-label class="ion-text-uppercase">{{ buttonTextByRole[secondButtonRole] }}</ion-label>
   </ion-button>
 </div>
