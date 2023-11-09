@@ -5,8 +5,8 @@ import { add, trash } from 'ionicons/icons';
 import { SQLiteCommunityService } from '../services/sqlite-community.service';
 import { UserDatabaseService } from '../services/user-database.service';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
-import { Preference, User } from '../models/models';
+import { JsonPipe, NgFor, NgIf } from '@angular/common';
+import { Plane, PlaneParsed, Preference, User } from '../models/models';
 import { PreferencesService } from '../services/preferences.service';
 
 const createSchemaTest: string = `
@@ -40,6 +40,7 @@ const createSchemaTest: string = `
     FormsModule,
     IonLabel,
     NgIf,
+    JsonPipe,
   ],
 })
 export class HomePage implements OnInit, OnDestroy {
@@ -48,6 +49,8 @@ export class HomePage implements OnInit, OnDestroy {
   newUserName: string = '';
   checked: boolean = false;
   prefs!: Preference;
+
+  showJSON!: Plane | undefined;
 
   @ViewChild(IonInput) input!: IonInput;
 
@@ -58,9 +61,8 @@ export class HomePage implements OnInit, OnDestroy {
   ) {
     addIcons({ add, trash });
     this.userdb.initUserDataBase();
-      
+
     this.users = this.userdb.getUsers();
-    console.log("se ha iniciado en el constructor");
   }
 
   async ngOnInit() {
@@ -70,6 +72,29 @@ export class HomePage implements OnInit, OnDestroy {
 
   async ngOnDestroy() {
     this.userdb.endUserDataBase();
+  }
+
+  async generateJSONTextSample() {
+    const planes: PlaneParsed | null = await this.userdb.saveAndShowJSONObject();
+
+    if (planes) {
+      this.showJSON = {
+        id: planes.id,
+        columns: planes.columns,
+        rows: planes.rows,
+        floor: planes.floor,
+        stage: JSON.parse(planes.stage),
+        wayPoints: planes.waypoints,
+        uuid: planes.uuid,
+        buildingId: planes.buildingId,
+        widthTiles: planes.widthTiles,
+        heightTiles: planes.heightTiles
+      };
+    }
+  }
+
+  hideJSONText() {
+    this.showJSON = undefined;
   }
 
   setPreference() {

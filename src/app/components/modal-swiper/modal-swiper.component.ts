@@ -8,7 +8,10 @@ import { PreferencesService } from 'src/app/services/preferences.service';
 import { states } from 'src/app/models/types';
 import { OptionModalComponent } from '../option-modal/option-modal.component';
 import { UserDatabaseService } from 'src/app/services/user-database.service';
-import { USERS } from 'src/app/mock/data';
+import { USERS } from 'src/app/mock/users';
+
+import { isPlatform } from '@ionic/angular/standalone';
+import { SQLiteCommunityService } from 'src/app/services/sqlite-community.service';
 
 
 @Component({
@@ -54,6 +57,7 @@ export class ModalSwiperComponent implements OnInit {
   constructor(
     private preferencesSrv: PreferencesService,
     private userDatabaseSrv: UserDatabaseService,
+    private _sqlite: SQLiteCommunityService,
   ) {
     addIcons({ personCircle });
     this.pointer = 0;
@@ -95,6 +99,12 @@ export class ModalSwiperComponent implements OnInit {
     }
 
     if (data.state === 'installation') {
+      if (this._sqlite.platform === 'web') {
+        await this.setEndModal();
+        console.log("se ha terminado");
+        return;
+      }
+
       this.disableBtn = true;
       this.cancelProgress = true;
 
@@ -112,8 +122,8 @@ export class ModalSwiperComponent implements OnInit {
 
   async setEndModal() {
     if (this.state === 'installation') {
-      await this.preferencesSrv.setBootstrapInsertion(false);
     }
+    await this.preferencesSrv.setBootstrapInsertion(false);
     this.emittCloseModa.emit(false);
   }
 

@@ -2,7 +2,7 @@ import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { SQLiteCommunityService } from './sqlite-community.service';
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from '../models/models';
+import { PlaneParsed, Sample, User } from '../models/models';
 
 const DB_USERS = 'userdb';
 
@@ -40,7 +40,25 @@ export class UserDatabaseService {
           );
     `;
 
+    // DROP TABLE IF EXISTS plane; 
+    const createPlane = `
+          CREATE TABLE IF NOT EXISTS plane (
+            id TEXT PRIMARY KEY,
+            columns INTEGER NOT NULL,
+            rows INTEGER NOT NULL,
+            widthTiles INTEGER NOT NULL,
+            heightTiles INTEGER NOT NULL,
+            stage TEXT NOT NULL,
+            uuid TEXT NOT NULL,
+            floor INTEGER NOT NULL,
+            waypoints TEXT NOT NULL,
+            buildingId TEXT NOT NULL,
+            published INTEGER DEFAULT 1
+          );
+    `;
+
     await this.db.execute(schema);
+    await this.db.execute(createPlane);
     await this.db.close();
 
     await this.loadUsers();
@@ -104,8 +122,6 @@ export class UserDatabaseService {
             this.progress.set(0.50);
 
             for (const user of users.slice(secondQuartile, thirdQuartile)) {
-              // const query = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
-              // await this.db.query(query);
               const statement = `INSERT INTO users (id, name) VALUES ('${user.id}', '${user.name}');`;
               const res = await this.db.run(statement, [], false, 'no');
 
@@ -157,6 +173,60 @@ export class UserDatabaseService {
     } catch (error) {
       console.error("Error en cancel massive insetion:", error);
     }
+  }
+
+  async saveAndShowJSONObject() {
+    if (this.db) {
+      try {
+
+        await this.db.open();
+
+        await this.db.query(`DELETE FROM plane;`);
+
+        const sampleObj: Sample = { name: 'leo', love: 'Aki' };
+
+        const plane: PlaneParsed = {
+          id: uuidv4(),
+          columns: 30,
+          rows: 40,
+          widthTiles: 3,
+          heightTiles: 4,
+          stage: JSON.stringify(sampleObj),
+          uuid: "X-X-X-X-X",
+          floor: 1,
+          waypoints: '{}',
+          buildingId: 'X-X-X-X-X',
+          published: false
+        };
+
+        const query = `
+          INSERT INTO plane (id, columns, rows, widthTiles, heightTiles, stage, uuid, floor, waypoints, buildingId, published)
+          VALUES ('${plane.id}', 
+            ${plane.columns},
+            ${plane.rows},
+            ${plane.widthTiles},
+            ${plane.heightTiles},
+            '${plane.stage}',
+            '${plane.uuid}',
+            ${plane.floor},
+            '${plane.waypoints}', '${plane.buildingId}', ${plane.published ? 1 : 0});
+        `;
+
+        await this.db.query(query);
+
+        const planes = await this.db.query(`SELECT * FROM plane;`);
+
+        console.log("PLANOS:", planes.values);
+
+        await this.db.close();
+
+        return planes.values ? planes.values[0] as PlaneParsed : null;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+    return null;
   }
 
   private async isOpenConnection() {
